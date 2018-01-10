@@ -6,7 +6,7 @@
 
 The goals / steps of this project are the following:
 * Use the simulator to collect data of good driving behavior
-* Build, a convolution neural network in Keras that predicts steering angles from images
+* Build a convolution neural network in Keras that predicts steering angles from images
 * Train and validate the model with a training and validation set
 * Test that the model successfully drives around track one without leaving the road
 * Summarize the results with a written report
@@ -32,7 +32,7 @@ The project includes the following files:
 * README.md as a writeup report summarizing the results
 * video.mp4
 
-Using the Udacity provided simulator and my drive.py file, the car can be driven autonomously around the track by executing
+Using the Udacity provided simulator and the drive.py file, the car can be driven autonomously around the track by executing
 ```sh
 python drive.py model.h5
 ```
@@ -48,6 +48,7 @@ The Network architecture used for the model is the [NVIDIA Architecture](https:/
 This model consists of 9 layers, including a normalization layer, 5 convolutional layers and 3 fully connected layers. The input image is transformed into YUV colorspace and fed into the network. The first layer of the network performs image normalization and mean centering using a Keras lambda layer (model.py line 108). We use strided convolutions in the first three convolutional layers with a 2×2 stride (model.py lines 110-112) and a 5×5 kernel and a non-strided convolution with a 3×3 kernel size in the last two convolutional layers (model.py lines 113-114) [[Bojarski et al., *End to End Learning for Self-Driving Cars*]](https://arxiv.org/pdf/1604.07316v1.pdf).
 
 Here is a visualization of the architecture
+
 ![alt text][image1]
 
 ### 2. Training and Validation Data
@@ -56,19 +57,19 @@ To collect data of good driving behavior the Udacity simulator was used in Train
 
 #### Data Creation
 
-Initially two laps were recorded on track one using center lane driving. Here is an example image of center lane driving:
+Initially two laps were recorded on track one using center lane driving.
 
 | Center Lane Driving  |
 |:--------------------:|
 | ![alt text][image2] |
 
-In order to increase the number of samples and gain generalization, 2 extra laps were recorder in opposite direction. "Weak" points (e.g. sharp corners) were repeated multiple times steering abruptly in order to recover the vehicle back to center.
+In order to increase the number of samples and improve generalization, 2 extra laps were recorder in the opposite direction. "Weak" points (e.g. sharp corners) were repeated multiple times steering abruptly in order to recover the vehicle back to center.
 
 All data were saved in a directory called `Data` including the `driving_log.csv` file and an `IMG` directory of the respective figures.
 
 #### Data Augmentation and Preprocessing
 
-##### a. Conversion to YUV
+**a. Conversion to YUV**
 
 All images were converted to YUV color space as dictated in the paper ["End to End Learning for Self-Driving Cars"](https://arxiv.org/pdf/1604.07316v1.pdf) that introduced the NVIDIA network architecture used in the project (model.py lines 110-119). In order for the model to work properly, the drive.py file was also changed, including a line that pre-processed the images before they were used in the prediction (drive.py line 65).  
 
@@ -76,18 +77,15 @@ All images were converted to YUV color space as dictated in the paper ["End to E
 |:-------------:|:------------------:|
 | ![alt text][image2]  |  ![alt text][image7] |
 
-##### b. Image flipping
+**b. Image flipping**
 
 In order to increase generalization and teach the network how to recover from a poor position or orientation, the data were augmented by adding flipped images and angles.
-
- Ηere is an image that has then been flipped:
-
 
 | Original Image   |  Flipped Image  |
 |:-------------:|:------------------:|
 | ![alt text][image2]  |  ![alt text][image5] |
 
-##### c. Using multiple cameras
+**c. Using multiple cameras**
 
 In the project left and right side camera images were also used to train the model. This way, the model was taught how to steer if the car drifts off to the left or the right. During training, all images were fed to the model as if they were coming from the center camera. In order to force the model steer a little harder towards the opposite direction in case of the side images, we used a small correction factor to the actual steering measurement, e.g.  
 
@@ -99,7 +97,7 @@ In the project left and right side camera images were also used to train the mod
 
 In our case the correction term was 0.1 (model.py line 25).
 
-##### d. Image cropping and resize
+**d. Image cropping and resize**
 
 To help the model train faster, we cropped each image to focus on only the portion that was useful for predicting a steering angle. Since the top portion of the image captured distracting elements like trees, hills and sky, and the bottom portion captured the hood of the car, we cropped 60 pixels from the top and 25 pixels from the bottom of each image. The cropping was done inside of the model using a built-in Keras layer (model.py line 104).
 
@@ -107,7 +105,7 @@ To help the model train faster, we cropped each image to focus on only the porti
 |:--------------------:|
 | ![alt text][image6] |
 
-##### e. Data normalization and mean centering
+**e. Data normalization and mean centering**
 
 For normalization and mean centering we used a [Keras lambda layer](https://keras.io/layers/core/#lambda) to our model (model.py line 108). Within this layer we normalized the image to a range between 0 and 1 by dividing by 127.5 and mean centered it by subtracting 1.0:
 `model.add(Lambda(lambda x: x/127.5-1.0))`.
